@@ -21,17 +21,17 @@ Use it
 
 To interpret:
 
-  $ whilecmp -i examples/fac.while 
-  fac = 362880
-  n = 1
+	$ whilecmp -i examples/fac.while 
+	fac = 362880
+	n = 1
 
 To compile:
 	$ whilecmp -c examples/fac.while fac.s
-  $ nasm -f elf fac.s
-  $ gcc fac.o -o fac
-  $ ./fac
-  fac = 362880
-  n = 1
+	$ nasm -f elf fac.s
+	$ gcc fac.o -o fac
+	$ ./fac
+	fac = 362880
+	n = 1
 
 About
 -----
