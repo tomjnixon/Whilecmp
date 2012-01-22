@@ -26,6 +26,7 @@ To interpret:
 	n = 1
 
 To compile:
+
 	$ whilecmp -c examples/fac.while fac.s
 	$ nasm -f elf fac.s
 	$ gcc fac.o -o fac
