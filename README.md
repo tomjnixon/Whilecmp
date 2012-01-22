@@ -39,4 +39,4 @@ About
 
 Made by [Tom Nixon](https://github.com/tomjnixon) (Haskell code), and [Matt Leach](https://github.com/matty3269) (x86 code).
 
-MIT Licenced; see `LICENCE`.
+MIT Licenced; see `LICENSE`.
