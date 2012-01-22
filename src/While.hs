@@ -29,4 +29,5 @@ data Statement = Assignment Variable Arithmetic
                | Sequence Statement Statement
                | If Boolean Statement Statement
                | While Boolean Statement
+               | Printf String [Arithmetic]
   deriving (Data, Typeable, Read, Show)

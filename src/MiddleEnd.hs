@@ -21,3 +21,5 @@ cs Skip = [A.Noop]
 cs (Sequence s1 s2) = cs s1 ++ cs s2
 cs (If b s1 s2) = cb b ++ [A.Branch (cs s1) (cs s2)]
 cs (While b s) = [A.Loop (cb b) (cs s)]
+cs (Printf s a) =
+	(concat $ map ca $ reverse a) ++ [A.Printf s $ length a]

@@ -20,6 +20,7 @@ data Instruction = Push Var
                  | Noop
                  | Branch Code Code
                  | Loop Code Code
+                 | Printf String Int
   deriving (Data, Typeable, Read, Show, Eq)
 
 type Code = [Instruction]

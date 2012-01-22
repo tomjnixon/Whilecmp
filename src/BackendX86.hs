@@ -4,6 +4,7 @@ module BackendX86 (compile) where
 import Data.Generics
 import Control.Monad.State
 import Data.List
+import Data.Char
 import qualified Data.Map as M
 
 import AbsMac
@@ -13,28 +14,41 @@ data CompilerState = CompilerState
                        , next_lbl :: Int
                        , stack_offset :: Int
                        , addr_map :: AddrMap
+                       , string_names :: StringMap
                        }
 type Gen = Control.Monad.State.State CompilerState
 
 type Label = String
 
--- Stuff for generating an address map.
+-- Stuff for generating an address and string map.
 type AddrMap = M.Map Variable Int
+type StringMap = M.Map String String
 
 is_variable :: Variable -> Bool
 is_variable variable = True
 
+is_string :: String -> Bool
+is_string _ = True
+
 get_all_vars = nub . listify is_variable
+get_all_strings = nub . listify is_string
 
 allocate_vars :: Code -> Gen ()
 allocate_vars code = do
 	state <- get
 	let vars = get_all_vars code
-	let addresses =
-		M.fromList $ zip (get_all_vars code) [4,8..]
+	let addresses = M.fromList $ zip vars [4,8..]
 	put $ state { stack_offset = 4 * (length vars)
 	            , addr_map = addresses
 	            }
+
+allocate_strings :: Code -> Gen ()
+allocate_strings code = do
+	state <- get
+	let strings = get_all_strings code
+	let string_names =
+		M.fromList $ zip strings $ map (("str_" ++).show) [0..]
+	put $ state { string_names = string_names }
 
 -- Low-level code generation functions.
 gen_label :: Gen (Label)
@@ -53,12 +67,16 @@ put_label lbl = put_line $ lbl ++ ":"
 get_addr :: Variable -> Gen (Int)
 get_addr var = gets $ (M.! var) . addr_map
 
+get_string_name :: String -> Gen (String)
+get_string_name s = gets $ (M.! s) . string_names
+
 get_code :: Gen (String)
 get_code = gets $ unlines . code
 
 compile' :: Code -> Gen String
 compile' code = do
 	allocate_vars code
+	allocate_strings code
 	gen_preamble
 	gen_list_int code
 	gen_postscript
@@ -66,7 +84,7 @@ compile' code = do
 
 compile :: Code -> String
 compile code =
-	evalState (compile' code) (CompilerState [] 0 0 M.empty)
+	evalState (compile' code) (CompilerState [] 0 0 M.empty M.empty)
 
 -- Code generation!
 
@@ -83,9 +101,10 @@ gen_preamble = do
 	state <- get
 	put_code "section .data"
 	
-	forM_ (M.toList $ addr_map state) $ \(Variable name, _) -> do
-		put_label $ "msg_" ++ name
-		put_code $ "db \"" ++ name ++ " = %d\", 10, 0"
+	forM_ (M.toList $ string_names state) $ \(string, name) -> do
+		put_label name
+		put_code $ "db "
+			++ (intercalate ", " $ map (show . ord) (string ++ "\0"))
 	
 	put_code "section .text"
 	put_code "global main"
@@ -98,11 +117,6 @@ gen_preamble = do
 gen_postscript :: Gen ()
 gen_postscript = do
 	state <- get
-	forM_ (M.toList $ addr_map state) $ \(Variable name, _) -> do
-		gen_code_int $ Fetch $ Variable name
-		put_code $ "push msg_" ++ name
-		put_code "call printf"
-	
 	put_code "leave"
 	put_code "ret"
 
@@ -210,3 +224,9 @@ gen_code (Loop c b) = do
 	gen_list_int b
 	put_code $ "jmp " ++ start
 	put_label exit
+
+gen_code (Printf s a) = do
+	string_name <- get_string_name s
+	put_code $ "push " ++ string_name
+	put_code "call printf"
+	put_code $ "add esp, " ++ (show $ 4 * (a + 1))

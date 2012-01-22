@@ -11,13 +11,13 @@ whileDef = emptyDef { commentStart = "{"
                     , commentEnd = "}"
                     , identStart = letter
                     , identLetter = alphaNum
-                    , opStart = oneOf "!&=<:;+-*"
-                    , opLetter = oneOf "!&=<:;+-*"
+                    , opStart = oneOf "!&=<:;+-*\""
+                    , opLetter = oneOf "!&=<:;+-*\""
                     , reservedOpNames = ["!", "&", "=", "<=", ":=",
                                          ";", "+", "-", "*", "(", ")"]
                     , reservedNames = ["true", "false", "skip",
                                        "if", "then", "else",
-                                       "while", "do"]
+                                       "while", "do", "printf"]
                     }
 
 lexer  = P.makeTokenParser whileDef
@@ -30,6 +30,7 @@ parens     = P.parens lexer
 natural    = P.natural lexer
 whiteSpace = P.whiteSpace lexer
 semiSep1   = P.semiSep1 lexer
+stringLiteral   = P.stringLiteral lexer
 
 variableParser :: Parser Variable
 variableParser = identifier >>= return . Variable
@@ -68,6 +69,7 @@ singleStatementParser =
 	                 , skipParser
 	                 , ifParser
 	                 , whileParser
+	                 , printfParser
 	                 ]
 		where
 			assignmentParser = do
@@ -90,6 +92,11 @@ singleStatementParser =
 				reserved "do"
 				s <- statementParser
 				return $ While b s
+			printfParser = do
+				reserved "printf"
+				s <- stringLiteral
+				args <- many arithmeticParser
+				return $ Printf s args
 
 statementParser = semiSep1 singleStatementParser >>= return . toTree
 	where
