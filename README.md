@@ -10,7 +10,7 @@ You'll need at least `ghc`, `haskell-parsec` and `cabal-install`.
 
 To install, run
 
-	cabal install --prefix=$HOME --user
+	cabal install --prefix=$HOME
 
 in the current directory.
 
