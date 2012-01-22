@@ -1,0 +1,6 @@
+n := 9;
+fac := 1;
+while ! (n = 1) do (
+	fac := fac * n;
+	n := n - 1
+)

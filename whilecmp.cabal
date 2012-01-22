@@ -1,0 +1,14 @@
+Name:                whilecmp
+Version:             0.0
+Description:         A really stupid while compiler/interpreter.
+License:             MIT
+License-file:        LICENSE
+Author:              Thomas Nixon and Matt Leach
+Maintainer:          tom@tomn.co.uk
+Build-Type:          Simple
+Cabal-Version:       >=1.2
+
+Executable whilecmp
+  Main-is: Main.hs
+  Build-Depends: base, haskell98, syb, parsec, containers, mtl
+  hs-source-dirs: src
