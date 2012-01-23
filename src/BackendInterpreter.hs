@@ -2,12 +2,13 @@
 module BackendInterpreter where
 import Control.Monad.State hiding (State)
 import Data.Generics
+import Printf
 
 import qualified Data.Map as M
 import AbsMac
 
-data StackVar = BoolVar Bool
-              | IntVar  Var
+data StackVar = BoolVar { boolVar :: Bool }
+              | IntVar  { intVar :: Var }
   deriving (Data, Typeable, Read, Show, Eq)
 type Stack = [StackVar]
 
@@ -63,6 +64,10 @@ step = do
 			put $ State ((if t then c1 else c2) ++ c) e s
 		State (Loop c1 c2:c) e s ->
 			put $ State (c1 ++ (Branch (c2 ++ [Loop c1 c2]) [Noop]:c)) e s
+		State (Printf fmt n:c) e s -> do
+			liftIO $ putStrLn "hi"
+			liftIO $ printfHack fmt $ map (fromIntegral. intVar) $ take n e
+			put $ State c (drop n e) s
 		State [] _ _ ->
 			put $ Stopped Finished state
 		s ->
