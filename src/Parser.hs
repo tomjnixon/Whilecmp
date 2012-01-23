@@ -90,7 +90,7 @@ singleStatementParser =
 				reserved "while"
 				b <- booleanParser
 				reserved "do"
-				s <- statementParser
+				s <- singleStatementParser
 				return $ While b s
 			printfParser = do
 				reserved "printf"
