@@ -77,7 +77,8 @@ run = do
 	if finished state
 		then
 			return ()
-		else
+		else do
+			step
 			run
 
 interpretCode program = 
