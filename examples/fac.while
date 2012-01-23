@@ -3,4 +3,6 @@ fac := 1;
 while ! (n = 1) do (
 	fac := fac * n;
 	n := n - 1
-)
+);
+printf "fac = %d\n" fac;
+printf "n = %d\n" n
