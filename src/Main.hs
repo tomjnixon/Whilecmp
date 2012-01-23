@@ -5,6 +5,7 @@ import BackendX86
 import Parser
 import MiddleEnd
 import System
+import Control.Monad.State
 
 main = do
 	args <- getArgs
@@ -18,7 +19,10 @@ parseThen f_name next = do
 		Right program ->
 			next program
 
-doInterpret program = show_state $ run $ newState $ cs program
+doInterpret program = do
+	interpretCode $ cs program
+	return ()
+
 doCompile out program = do
 	let am = cs program
 	let code = compile am
