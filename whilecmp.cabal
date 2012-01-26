@@ -10,5 +10,5 @@ Cabal-Version:       >=1.2
 
 Executable whilecmp
   Main-is: Main.hs
-  Build-Depends: base, haskell98, syb, parsec, containers, mtl
+  Build-Depends: base, haskell98, syb, parsec, containers, mtl, libffi
   hs-source-dirs: src

@@ -20,7 +20,9 @@ parseThen f_name next = do
 			next program
 
 doInterpret program = do
-	interpretCode $ cs program
+	print $ cs program
+	result <- interpretCode $ cs program
+	print result
 	return ()
 
 doCompile out program = do
